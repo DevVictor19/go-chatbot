@@ -1,6 +1,11 @@
 package api
 
+import (
+	"server/src/api/database"
+	"server/src/api/routes"
+)
+
 func InitHttpServer() {
-	initDatabaseConnection()
-	initRoutes()
+	database.InitDatabaseConnection()
+	routes.InitRoutes()
 }

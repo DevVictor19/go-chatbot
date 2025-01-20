@@ -1,4 +1,4 @@
-package api
+package database
 
 import (
 	"fmt"
@@ -23,7 +23,7 @@ func getConnectionUrl() string {
 	return fmt.Sprintf("mongodb://%s:%s@%s:27017", user, pwd, host)
 }
 
-func initDatabaseConnection() {
+func InitDatabaseConnection() {
 	client, err := mongo.Connect(options.Client().ApplyURI(getConnectionUrl()))
 
 	if err != nil {
