@@ -11,7 +11,7 @@ import (
 
 var mongoClient *mongo.Client
 
-func getDatabase() *mongo.Database {
+func GetDatabase() *mongo.Database {
 	return mongoClient.Database("chatbot")
 }
 
