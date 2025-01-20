@@ -1,8 +1,24 @@
 package repositories
 
 import (
-	"server/src/api"
 	"server/src/api/models"
+
+	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
-var ChatMessageRepository = newRepository[models.ChatMessage](api.GetDatabase(), "chat-message")
+type ChatMessageRepository struct {
+	*Repository[models.ChatMessage]
+}
+
+var chatMsgRepository *ChatMessageRepository
+
+func NewChatMessageRepository(db *mongo.Database) *ChatMessageRepository {
+	if chatMsgRepository == nil {
+		chatMsgRepository = &ChatMessageRepository{
+			Repository: newRepository[models.ChatMessage](db, "chat-message"),
+		}
+		return chatMsgRepository
+	}
+
+	return chatMsgRepository
+}

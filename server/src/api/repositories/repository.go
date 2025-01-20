@@ -17,15 +17,15 @@ type PaginatedResult[T interface{}] struct {
 	Data         []*T  `json:"data"`
 }
 
-type repository[T interface{}] struct {
+type Repository[T interface{}] struct {
 	coll *mongo.Collection
 }
 
-func newRepository[T interface{}](db *mongo.Database, collection string) *repository[T] {
-	return &repository[T]{coll: db.Collection(collection)}
+func newRepository[T interface{}](db *mongo.Database, collection string) *Repository[T] {
+	return &Repository[T]{coll: db.Collection(collection)}
 }
 
-func (r *repository[T]) Create(ctx context.Context, model *T) error {
+func (r *Repository[T]) Create(ctx context.Context, model *T) error {
 	_, err := r.coll.InsertOne(ctx, model)
 
 	if err != nil {
@@ -35,7 +35,7 @@ func (r *repository[T]) Create(ctx context.Context, model *T) error {
 	return nil
 }
 
-func (r *repository[T]) FindById(ctx context.Context, id string) (*T, error) {
+func (r *Repository[T]) FindById(ctx context.Context, id string) (*T, error) {
 	var result T
 
 	err := r.coll.FindOne(ctx, bson.D{{Key: "_id", Value: id}}).Decode(&result)
@@ -47,7 +47,7 @@ func (r *repository[T]) FindById(ctx context.Context, id string) (*T, error) {
 	return &result, nil
 }
 
-func (r *repository[T]) FindAll(ctx context.Context) ([]*T, error) {
+func (r *Repository[T]) FindAll(ctx context.Context) ([]*T, error) {
 	cur, err := r.coll.Find(ctx, bson.D{})
 
 	if err != nil {
@@ -73,7 +73,7 @@ func (r *repository[T]) FindAll(ctx context.Context) ([]*T, error) {
 	return results, nil
 }
 
-func (r *repository[T]) FindAllPaginated(ctx context.Context, page, limit uint) (*PaginatedResult[T], error) {
+func (r *Repository[T]) FindAllPaginated(ctx context.Context, page, limit uint) (*PaginatedResult[T], error) {
 	if page == 0 {
 		page = 1
 	}
@@ -116,7 +116,7 @@ func (r *repository[T]) FindAllPaginated(ctx context.Context, page, limit uint) 
 	}, nil
 }
 
-func (r *repository[T]) Update(ctx context.Context, model *T) error {
+func (r *Repository[T]) Update(ctx context.Context, model *T) error {
 	idField := reflect.ValueOf(model).Elem().FieldByName("ID")
 	if !idField.IsValid() || idField.Kind() != reflect.String {
 		return fmt.Errorf("model does not have a valid 'ID' field")
@@ -133,7 +133,7 @@ func (r *repository[T]) Update(ctx context.Context, model *T) error {
 	return err
 }
 
-func (r *repository[T]) Delete(ctx context.Context, id string) error {
+func (r *Repository[T]) Delete(ctx context.Context, id string) error {
 	filter := bson.M{"_id": id}
 
 	_, err := r.coll.DeleteOne(ctx, filter)
