@@ -17,7 +17,40 @@ type AuthController struct {
 }
 
 func (c *AuthController) Login(ctx *gin.Context) {
+	var body dtos.LoginDto
 
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	customer, _ := c.repository.FindByEmail(ctx, body.Email)
+
+	if customer == nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid email or password"})
+		return
+	}
+
+	isValidPassword := services.Compare(customer.Password, body.Password)
+
+	if !isValidPassword {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid email or password"})
+		return
+	}
+
+	token, _ := services.GenerateJwtToken(customer.Email)
+
+	if token == "" {
+		ctx.JSON(http.StatusInternalServerError,
+			gin.H{"message": "Error while generating jwt"})
+		return
+	}
+
+	response := dtos.TokenDto{
+		Token: token,
+	}
+
+	ctx.JSON(http.StatusOK, &response)
 }
 
 func (c *AuthController) Signup(ctx *gin.Context) {

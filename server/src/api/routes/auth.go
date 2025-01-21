@@ -16,4 +16,5 @@ func initAuthRoutes(r *gin.Engine) {
 	api := r.Group("/auth")
 
 	api.POST("/signup", authController.Signup)
+	api.POST("/login", authController.Login)
 }
