@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type colorSchema struct {
@@ -14,12 +12,12 @@ type colorSchema struct {
 }
 
 type Business struct {
-	ID          primitive.ObjectID `json:"id" bson:"_id,omitempty"`
-	CustomerId  string             `json:"customer_id" bson:"customer_id"`
-	Email       string             `json:"email" bson:"email"`
-	Specialty   string             `json:"specialty" bson:"specialty"`
-	History     string             `json:"history" bson:"history"`
-	ColorSchema colorSchema        `json:"color_schema" bson:"color_schema"`
-	UpdatedAt   time.Time          `json:"updated_at" bson:"updated_at"`
-	CreateAt    time.Time          `json:"created_at" bson:"created_at"`
+	ID          string      `json:"id" bson:"_id,omitempty"`
+	CustomerId  string      `json:"customer_id" bson:"customer_id"`
+	Email       string      `json:"email" bson:"email"`
+	Specialty   string      `json:"specialty" bson:"specialty"`
+	History     string      `json:"history" bson:"history"`
+	ColorSchema colorSchema `json:"color_schema" bson:"color_schema"`
+	UpdatedAt   time.Time   `json:"updated_at" bson:"updated_at"`
+	CreateAt    time.Time   `json:"created_at" bson:"created_at"`
 }

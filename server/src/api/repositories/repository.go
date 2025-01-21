@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
@@ -26,6 +27,15 @@ func newRepository[T interface{}](db *mongo.Database, collection string) *Reposi
 }
 
 func (r *Repository[T]) Create(ctx context.Context, model *T) error {
+	v := reflect.ValueOf(model).Elem()
+	field := v.FieldByName("ID")
+
+	if field.IsValid() && field.CanSet() {
+		if field.Kind() == reflect.String && field.String() == "" {
+			field.SetString(primitive.NewObjectID().Hex())
+		}
+	}
+
 	_, err := r.coll.InsertOne(ctx, model)
 
 	if err != nil {
