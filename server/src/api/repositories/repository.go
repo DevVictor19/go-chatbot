@@ -12,8 +12,8 @@ import (
 )
 
 type PaginatedResult[T interface{}] struct {
-	Page         uint  `json:"page"`
-	ItemsPerPage uint  `json:"items_per_page"`
+	Page         int64 `json:"page"`
+	ItemsPerPage int64 `json:"items_per_page"`
 	Total        int64 `json:"total"`
 	Data         []*T  `json:"data"`
 }
@@ -83,15 +83,15 @@ func (r *Repository[T]) FindAll(ctx context.Context) ([]*T, error) {
 	return results, nil
 }
 
-func (r *Repository[T]) FindAllPaginated(ctx context.Context, page, limit uint) (*PaginatedResult[T], error) {
-	if page == 0 {
-		page = 1
+func (r *Repository[T]) FindAllPaginated(ctx context.Context, page, limit int64) (*PaginatedResult[T], error) {
+	if page < 0 {
+		page = 0
 	}
 	if limit == 0 {
 		limit = 10
 	}
 
-	skip := int64(page * limit)
+	skip := page * limit
 
 	total, err := r.coll.CountDocuments(ctx, bson.D{})
 	if err != nil {
@@ -99,7 +99,7 @@ func (r *Repository[T]) FindAllPaginated(ctx context.Context, page, limit uint) 
 	}
 
 	cur, err := r.coll.Find(ctx, bson.D{},
-		options.Find().SetSkip(skip).SetLimit(int64(limit)))
+		options.Find().SetSkip(skip).SetLimit(limit))
 	if err != nil {
 		return nil, err
 	}
