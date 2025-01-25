@@ -20,7 +20,7 @@ func (c *AuthController) Login(ctx *gin.Context) {
 	var body dtos.LoginDto
 
 	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
