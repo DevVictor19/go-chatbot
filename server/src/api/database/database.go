@@ -10,9 +10,14 @@ import (
 )
 
 var mongoClient *mongo.Client
+var mongoDatabase *mongo.Database
 
 func GetDatabase() *mongo.Database {
-	return mongoClient.Database("chatbot")
+	if mongoDatabase == nil {
+		mongoDatabase = mongoClient.Database("chatbot")
+		return mongoDatabase
+	}
+	return mongoDatabase
 }
 
 func getConnectionUrl() string {
