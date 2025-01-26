@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"context"
-	"fmt"
 	"server/src/api/models"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -34,8 +33,6 @@ func (r *BusinessRepository) FindAllPaginatedByCustomerId(
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println(customerId)
 
 	cur, err := r.coll.Find(ctx, filter,
 		options.Find().SetSkip(skip).SetLimit(limit))
