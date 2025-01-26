@@ -13,7 +13,7 @@ import (
 )
 
 type AuthController struct {
-	repository repositories.CustomerRepository
+	repository *repositories.CustomerRepository
 }
 
 func (c *AuthController) Login(ctx *gin.Context) {
@@ -94,7 +94,7 @@ var authController *AuthController
 func NewAuthController(customerRepository *repositories.CustomerRepository) *AuthController {
 	if authController == nil {
 		authController = &AuthController{
-			repository: *customerRepository,
+			repository: customerRepository,
 		}
 		return authController
 	}

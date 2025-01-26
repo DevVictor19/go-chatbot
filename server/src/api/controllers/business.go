@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 	"server/src/api/dtos"
+	"server/src/api/helpers"
 	"server/src/api/models"
 	"server/src/api/repositories"
 	"strconv"
@@ -12,8 +13,8 @@ import (
 )
 
 type BusinessController struct {
-	businessRepository repositories.BusinessRepository
-	customerRepository repositories.CustomerRepository
+	businessRepository *repositories.BusinessRepository
+	customerRepository *repositories.CustomerRepository
 }
 
 func (ctl *BusinessController) Create(ctx *gin.Context) {
@@ -24,7 +25,7 @@ func (ctl *BusinessController) Create(ctx *gin.Context) {
 		return
 	}
 
-	customer := ctl.getAuthenticatedCustomer(ctx)
+	customer := helpers.GetAuthenticatedCustomer(ctx, ctl.customerRepository)
 	if customer == nil {
 		return
 	}
@@ -69,7 +70,7 @@ func (ctl *BusinessController) FindAllPaginated(ctx *gin.Context) {
 		return
 	}
 
-	customer := ctl.getAuthenticatedCustomer(ctx)
+	customer := helpers.GetAuthenticatedCustomer(ctx, ctl.customerRepository)
 	if customer == nil {
 		return
 	}
@@ -98,7 +99,7 @@ func (ctl *BusinessController) FindById(ctx *gin.Context) {
 		return
 	}
 
-	customer := ctl.getAuthenticatedCustomer(ctx)
+	customer := helpers.GetAuthenticatedCustomer(ctx, ctl.customerRepository)
 	if customer == nil {
 		return
 	}
@@ -127,7 +128,7 @@ func (ctl *BusinessController) Update(ctx *gin.Context) {
 		return
 	}
 
-	customer := ctl.getAuthenticatedCustomer(ctx)
+	customer := helpers.GetAuthenticatedCustomer(ctx, ctl.customerRepository)
 	if customer == nil {
 		return
 	}
@@ -160,7 +161,7 @@ func (ctl *BusinessController) Delete(ctx *gin.Context) {
 		return
 	}
 
-	customer := ctl.getAuthenticatedCustomer(ctx)
+	customer := helpers.GetAuthenticatedCustomer(ctx, ctl.customerRepository)
 	if customer == nil {
 		return
 	}
@@ -176,33 +177,6 @@ func (ctl *BusinessController) Delete(ctx *gin.Context) {
 	}
 }
 
-func (ctl *BusinessController) getAuthenticatedCustomer(ctx *gin.Context) *models.Customer {
-	email, exists := ctx.Get("email")
-	if !exists {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Email not found in context"})
-		return nil
-	}
-
-	emailString, ok := email.(string)
-	if !ok {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Invalid type assertion email"})
-		return nil
-	}
-
-	customer, err := ctl.customerRepository.FindByEmail(ctx, emailString)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to find customer by email"})
-		return nil
-	}
-
-	if customer == nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"message": "Customer not found"})
-		return nil
-	}
-
-	return customer
-}
-
 var businessController *BusinessController
 
 func NewBusinessController(
@@ -211,8 +185,8 @@ func NewBusinessController(
 
 	if businessController == nil {
 		businessController = &BusinessController{
-			businessRepository: *businessRepository,
-			customerRepository: *customerRepository,
+			businessRepository: businessRepository,
+			customerRepository: customerRepository,
 		}
 		return businessController
 	}
