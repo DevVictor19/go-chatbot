@@ -15,7 +15,7 @@ type PaginatedResult[T interface{}] struct {
 	Page         int64 `json:"page"`
 	ItemsPerPage int64 `json:"items_per_page"`
 	Total        int64 `json:"total"`
-	Data         []*T  `json:"data"`
+	Data         *[]*T `json:"data"`
 }
 
 type Repository[T interface{}] struct {
@@ -122,7 +122,7 @@ func (r *Repository[T]) FindAllPaginated(ctx context.Context, page, limit int64)
 		Page:         page,
 		ItemsPerPage: limit,
 		Total:        total,
-		Data:         results,
+		Data:         &results,
 	}, nil
 }
 

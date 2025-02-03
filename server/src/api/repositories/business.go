@@ -58,7 +58,7 @@ func (r *BusinessRepository) FindAllPaginatedByCustomerId(
 		Page:         page,
 		ItemsPerPage: limit,
 		Total:        total,
-		Data:         results,
+		Data:         &results,
 	}, nil
 }
 
